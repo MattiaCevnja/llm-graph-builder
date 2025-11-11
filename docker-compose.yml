@@ -26,21 +26,6 @@ services:
       timeout: 5s
       retries: 5
 
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-    container_name: n8n-workflow
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=admin
-    volumes:
-      - n8n_data:/home/node/.n8n
-    networks:
-      - net
-    restart: unless-stopped
-
 networks:
   net:
 
@@ -49,4 +34,3 @@ volumes:
   neo4j_logs:
   neo4j_import:
   neo4j_plugins:
-  n8n_data:
