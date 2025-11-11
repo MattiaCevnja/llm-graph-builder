@@ -54,7 +54,14 @@ Update the environment variable in `.env` file. Refer example.env in backend fol
 
 `OPENAI_API_KEY`: Open AI key to use incase of openai embeddings
 
-`EMBEDDING_MODEL` : "all-MiniLM-L6-v2" or "openai" or "vertexai"
+`EMBEDDING_MODEL` : Embedding model to use. Options:
+   - "all-MiniLM-L6-v2" (default, English-only, 384 dim)
+   - "multilingual-minilm" (multilingual, 50+ languages, 384 dim) - Recommended for multilingual support
+   - "multilingual-mpnet" (multilingual, 50+ languages, 768 dim) - Higher quality multilingual model
+   - "openai" (multilingual, 100+ languages, 1536 dim) - Uses text-embedding-3-small, requires OPENAI_API_KEY
+   - "vertexai" (multilingual, 768 dim) - Requires Google Cloud credentials
+   - "titan" (multilingual, 1536 dim) - Requires AWS Bedrock credentials
+   - Any HuggingFace model name (e.g., "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 
 `NEO4J_URI` : Neo4j URL
 

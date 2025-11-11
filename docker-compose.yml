@@ -1,6 +1,6 @@
 services:
   database:
-    image: neo4j
+    image: neo4j:community
     container_name: neo4j-database
     environment:
       - NEO4J_AUTH=neo4j/password

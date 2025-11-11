@@ -86,35 +86,352 @@ Configure chat modes using the `VITE_CHAT_MODES` variable:
 
 ### **Running Backend and Frontend Separately**
 
-For development, you can run the backend and frontend independently.
+This guide helps you configure and run the frontend and backend of the application locally.
 
-#### **Frontend Setup**
-1. Create the `.env` file in the `frontend` folder by copying `frontend/example.env`.
-2. Update environment variables as needed.
-3. Run:
-   ```bash
-   cd frontend
-   yarn
-   yarn run dev
-   ```
+#### **Prerequisites**
+
+- **Python 3.8+** with virtual environment
+- **Node.js 18+** and **Yarn** (or npm)
+- **Neo4j** running (pre-configured: `bolt://localhost:7687`, credentials `neo4j/password`)
 
 #### **Backend Setup**
-1. Create the `.env` file in the `backend` folder by copying `backend/example.env`.
-2. Preconfigure user credentials in the `.env` file to bypass the login dialog:
-   ```bash
-   NEO4J_URI=<your-neo4j-uri>
-   NEO4J_USERNAME=<your-username>
-   NEO4J_PASSWORD=<your-password>
-   NEO4J_DATABASE=<your-database-name>
-   ```
-3. Run:
-   ```bash
-   cd backend
-   python -m venv envName
-   source envName/bin/activate
-   pip install -r requirements.txt
-   uvicorn score:app --reload
-   ```
+
+**1. Verify/Create `.env` file in backend**
+
+The `.env` file should already be present in `backend/.env`. Verify it contains at least:
+
+```env
+# Neo4j Configuration (pre-configured for your Docker container)
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=password
+NEO4J_DATABASE=neo4j
+
+# Other optional configurations
+# EMBEDDING_MODEL: Embedding model to use
+#   - "all-MiniLM-L6-v2" (default, English only, 384 dim)
+#   - "multilingual-minilm" (multilingual, 50+ languages, 384 dim) - Recommended for multilingual support
+#   - "multilingual-mpnet" (multilingual, 50+ languages, 768 dim) - Higher quality
+#   - "openai" (multilingual, 1536 dim) - Requires OPENAI_API_KEY
+#   - "vertexai" (multilingual, 768 dim) - Requires Google Cloud credentials
+EMBEDDING_MODEL=all-MiniLM-L6-v2
+IS_EMBEDDING=TRUE
+KNN_MIN_SCORE=0.94
+UPDATE_GRAPH_CHUNKS_PROCESSED=20
+NUMBER_OF_CHUNKS_TO_COMBINE=6
+ENTITY_EMBEDDING=FALSE
+GCS_FILE_CACHE=False
+```
+
+**2. Install Python dependencies**
+
+```bash
+cd backend
+
+# If you don't have a virtual environment yet, create one
+python -m venv venv
+
+# Activate the virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+# venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+**3. Start the Backend**
+
+```bash
+# Make sure you're in the backend directory
+cd backend
+
+# Start the server (port 8000 by default)
+uvicorn score:app --reload --host 0.0.0.0 --port 8000
+```
+
+The backend will be available at: **http://localhost:8000**
+
+You can verify it's working by visiting: **http://localhost:8000/health**
+
+#### **Frontend Setup**
+
+**1. Create `.env` file in frontend**
+
+Create a `.env` file in the `frontend/` directory:
+
+```bash
+cd frontend
+touch .env
+```
+
+Add to the `.env` file:
+
+```env
+# Backend API URL (port 8000)
+VITE_BACKEND_API_URL=http://localhost:8000
+
+# Other optional configurations (if needed)
+VITE_REACT_APP_SOURCES=local,wiki,s3,youtube,web
+VITE_SKIP_AUTH=true
+```
+
+**2. Install Node.js dependencies**
+
+```bash
+cd frontend
+
+# Install dependencies (use yarn if available, otherwise npm)
+yarn install
+# or
+npm install
+```
+
+**3. Start the Frontend**
+
+```bash
+# Make sure you're in the frontend directory
+cd frontend
+
+# Start the development server
+yarn dev
+# or
+npm run dev
+```
+
+The frontend will be available at: **http://localhost:5173** (default Vite port)
+
+#### **Complete Startup**
+
+**Option 1: Two Separate Terminals (Recommended)**
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+uvicorn score:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+yarn dev
+```
+
+**Option 2: Automatic Startup Script**
+
+You can create a script to start both simultaneously.
+
+**For macOS/Linux** (`start.sh`):
+```bash
+#!/bin/bash
+
+# Start backend in background
+cd backend
+source venv/bin/activate
+uvicorn score:app --reload --host 0.0.0.0 --port 8000 &
+BACKEND_PID=$!
+
+# Wait for backend to be ready
+sleep 3
+
+# Start frontend
+cd ../frontend
+yarn dev &
+FRONTEND_PID=$!
+
+echo "Backend PID: $BACKEND_PID"
+echo "Frontend PID: $FRONTEND_PID"
+echo "Press Ctrl+C to stop both"
+
+# Wait for user to press Ctrl+C
+wait
+```
+
+Make executable: `chmod +x start.sh` and run: `./start.sh`
+
+#### **Configuration Verification**
+
+**1. Verify Backend**
+
+Open your browser and visit:
+- **Health Check**: http://localhost:8000/health
+- You should see: `{"healthy": true}`
+
+**2. Verify Frontend**
+
+Open your browser and visit:
+- **Frontend**: http://localhost:5173
+- You should see the application interface
+
+**3. Verify Neo4j Connection**
+
+1. In the frontend, click the connection button
+2. Enter:
+   - Protocol: `bolt://`
+   - Host: `localhost`
+   - Port: `7687`
+   - Database: `neo4j`
+   - Username: `neo4j`
+   - Password: `password`
+3. Click "Connect"
+4. You should see a successful connection message
+
+#### **Troubleshooting**
+
+**Backend won't start**
+
+**Error: "Module not found"**
+```bash
+# Make sure you've installed all dependencies
+cd backend
+pip install -r requirements.txt
+```
+
+**Error: "Port already in use"**
+```bash
+# Change the port in the uvicorn command
+uvicorn score:app --reload --host 0.0.0.0 --port 8001
+# And update VITE_BACKEND_API_URL in frontend/.env
+```
+
+**Error: "Cannot connect to Neo4j"**
+- Verify that the Neo4j container is running: `docker ps | grep knowledge-graph`
+- Verify credentials in the `backend/.env` file
+- Test the connection: `cypher-shell -a bolt://localhost:7687 -u neo4j -p password`
+
+**Frontend won't start**
+
+**Error: "Cannot find module"**
+```bash
+cd frontend
+rm -rf node_modules
+yarn install  # or npm install
+```
+
+**Error: "Cannot connect to backend"**
+- Verify that the backend is running on http://localhost:8000
+- Verify the `frontend/.env` file contains: `VITE_BACKEND_API_URL=http://localhost:8000`
+- Restart the frontend after modifying the `.env` file
+
+**Error: "Port 5173 already in use"**
+```bash
+# Vite will automatically use the next available port
+# Or specify a different port by modifying vite.config.ts
+```
+
+**CORS Errors**
+
+If you see CORS errors in the browser:
+- The backend is already configured to allow CORS from any origin (`allow_origins=["*"]`)
+- If they persist, verify that the backend is running and accessible
+
+#### **Port Structure**
+
+- **Backend**: `8000` (FastAPI/Uvicorn)
+- **Frontend**: `5173` (Vite dev server)
+- **Neo4j Bolt**: `7687` (pre-configured)
+- **Neo4j HTTP**: `7474` (for Neo4j Browser, optional)
+
+#### **Useful Commands**
+
+**Stop Services**
+
+**Backend**: Press `Ctrl+C` in the backend terminal
+
+**Frontend**: Press `Ctrl+C` in the frontend terminal
+
+**Check Processes**
+
+```bash
+# Check if backend is running
+lsof -i :8000
+
+# Check if frontend is running
+lsof -i :5173
+
+# Check if Neo4j is running
+docker ps | grep knowledge-graph
+```
+
+**Logs and Debug**
+
+**Backend**: Logs are printed directly in the terminal where you started uvicorn
+
+**Frontend**: Open the browser console (F12) to see logs and errors
+
+#### **Important Notes**
+
+1. **`.env` files**: Make sure the `.env` files are in the correct directory:
+   - `backend/.env` for backend
+   - `frontend/.env` for frontend
+
+2. **Virtual Environment**: Always remember to activate the virtual environment before starting the backend
+
+3. **Dependencies**: If you add new dependencies, remember to update:
+   - `backend/requirements.txt` for Python
+   - `frontend/package.json` for Node.js
+
+4. **Hot Reload**: Both servers support hot reload:
+   - Backend: `--reload` flag in uvicorn
+   - Frontend: Vite does it automatically
+
+5. **Neo4j**: Make sure the Neo4j container is always running before starting the application
+
+#### **Multilingual Support**
+
+The system supports multilingual capabilities through multilingual embedding models. This allows you to:
+- Load documents in different languages (Italian, French, German, Spanish, etc.)
+- Query in one language and get results from documents in other languages
+- It's no longer necessary for the query to be in the same language as the document
+
+**Multilingual Configuration**
+
+To enable multilingual support, modify the `backend/.env` file:
+
+```env
+# Option 1: Lightweight multilingual model (384 dimensions, 50+ languages)
+EMBEDDING_MODEL=multilingual-minilm
+
+# Option 2: High-quality multilingual model (768 dimensions, 50+ languages)
+EMBEDDING_MODEL=multilingual-mpnet
+
+# Option 3: OpenAI (multilingual, requires API key)
+# Uses the text-embedding-3-small model (1536 dim) which supports 100+ languages
+EMBEDDING_MODEL=openai
+OPENAI_API_KEY=sk-your-openai-api-key-here
+
+# Option 4: Vertex AI (multilingual, requires Google Cloud credentials)
+EMBEDDING_MODEL=vertexai
+```
+
+**Available Models**
+
+| Model | Languages Supported | Dimensions | Quality | Notes |
+|-------|-------------------|------------|---------|-------|
+| `multilingual-minilm` | 50+ | 384 | Good | Recommended for most cases |
+| `multilingual-mpnet` | 50+ | 768 | Excellent | Better quality, slower |
+| `openai` | 100+ | 1536 | Excellent | Uses text-embedding-3-small, requires OPENAI_API_KEY, paid |
+| `vertexai` | 100+ | 768 | Excellent | Requires Google Cloud credentials |
+| `all-MiniLM-L6-v2` | English only | 384 | Good | Default, only for English documents |
+
+**Important Notes**
+
+1. **Model Change**: If you change the embedding model after already loading documents, you will need to:
+   - Recreate embeddings for all existing chunks
+   - Recreate vector indexes in Neo4j
+
+2. **Dimension Compatibility**: Make sure the new model's dimension is compatible with existing indexes, otherwise you'll need to recreate them.
+
+3. **Performance**: Multilingual models are generally slower than monolingual models, but offer greater flexibility.
+
+#### **Next Steps**
+
+Once everything is running:
+1. Open http://localhost:5173 in your browser
+2. Connect to Neo4j using the configured credentials
+3. Start loading documents and creating your Knowledge Graph!
 
 ---
 
