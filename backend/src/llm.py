@@ -50,15 +50,26 @@ def get_llm(model: str):
             )
         elif "openai" in model:
             model_name, api_key = env_value.split(",")
+            # If api_key is a placeholder, use OPENAI_API_KEY from env
+            if api_key.strip() == "openai_api_key":
+                api_key = os.getenv('OPENAI_API_KEY')
+                if not api_key:
+                    err_msg = (
+                        f"OPENAI_API_KEY not found in environment. "
+                        f"Set OPENAI_API_KEY or provide actual key in "
+                        f"{env_key}"
+                    )
+                    raise Exception(err_msg)
+
             if "o3-mini" in model:
-                llm= ChatOpenAI(
-                api_key=api_key,
-                model=model_name)
+                llm = ChatOpenAI(
+                    api_key=api_key,
+                    model=model_name)
             else:
                 llm = ChatOpenAI(
-                api_key=api_key,
-                model=model_name,
-                temperature=0,
+                    api_key=api_key,
+                    model=model_name,
+                    temperature=0,
                 )
 
         elif "azure" in model:

@@ -28,14 +28,15 @@ def merge_relationship_between_chunk_and_entites(graph: Neo4jGraph, graph_docume
             batch_data.append(query_data)
           
     if batch_data:
+        # Include both the specific node type and __Entity__ label for proper entity merging
+        # This ensures entities match those created by add_graph_documents with baseEntityLabel=True
         unwind_query = """
                     UNWIND $batch_data AS data
                     MATCH (c:Chunk {id: data.chunk_id})
-                    CALL apoc.merge.node([data.node_type], {id: data.node_id}) YIELD node AS n
+                    CALL apoc.merge.node([data.node_type, '__Entity__'], {id: data.node_id}) YIELD node AS n
                     MERGE (c)-[:HAS_ENTITY]->(n)
                 """
-        execute_graph_query(graph,unwind_query, params={"batch_data": batch_data})
-        execute_graph_query(graph,unwind_query, params={"batch_data": batch_data})
+        execute_graph_query(graph, unwind_query, params={"batch_data": batch_data})
 
     
 def create_chunk_embeddings(graph, chunkId_chunkDoc_list, file_name):

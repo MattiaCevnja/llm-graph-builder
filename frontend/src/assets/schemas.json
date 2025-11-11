@@ -1,34 +1,12 @@
-[{
-  "labels": [
-    "Answer",
-    "Question",
-    "Tag",
-    "User"
-  ],
-  "relationshipTypes": [
-    "ACCEPTED",
-    "ANSWERED",
-    "POSTED",
-    "SIMILAR",
-    "TAGGED"
-  ],
-  "schema": "stackoverflow"
-},
-{
-    "labels": [
-      "Actor",
-      "Director",
-      "Genre",
-      "Movie",
-      "Person",
-      "User"
-    ],
-    "relationshipTypes": [
-      "ACTED_IN",
-      "DIRECTED",
-      "IN_GENRE",
-      "RATED"
-    ],
+[
+  {
+    "labels": ["Answer", "Question", "Tag", "User"],
+    "relationshipTypes": ["ACCEPTED", "ANSWERED", "POSTED", "SIMILAR", "TAGGED"],
+    "schema": "stackoverflow"
+  },
+  {
+    "labels": ["Actor", "Director", "Genre", "Movie", "Person", "User"],
+    "relationshipTypes": ["ACTED_IN", "DIRECTED", "IN_GENRE", "RATED"],
     "schema": "movies"
   },
   {
@@ -66,50 +44,19 @@
       "VERSION"
     ],
     "schema": "network"
-  }, 
+  },
   {
-    "labels": [
-      "Category",
-      "Customer",
-      "Order",
-      "Product",
-      "Supplier"
-    ],
-    "relationshipTypes": [
-      "ORDERS",
-      "PART_OF",
-      "PURCHASED",
-      "SUPPLIES"
-    ],
+    "labels": ["Category", "Customer", "Order", "Product", "Supplier"],
+    "relationshipTypes": ["ORDERS", "PART_OF", "PURCHASED", "SUPPLIES"],
     "schema": "retail"
-  },{
-    "labels": [
-      "Tag",
-      "Link",
-      "Post",
-      "User"
-    ],
-    "relationshipTypes": [
-      "CONTAINS",
-      "FOLLOWS",
-      "MENTIONS",
-      "POSTS",
-      "REPLY_TO",
-      "REPOST",
-      "TAGS"
-    ],
+  },
+  {
+    "labels": ["Tag", "Link", "Post", "User"],
+    "relationshipTypes": ["CONTAINS", "FOLLOWS", "MENTIONS", "POSTS", "REPLY_TO", "REPOST", "TAGS"],
     "schema": "social"
   },
   {
-    "labels": [
-      "Business",
-      "Category",
-      "City",
-      "Label",
-      "Photo",
-      "Review",
-      "User"
-    ],
+    "labels": ["Business", "Category", "City", "Label", "Photo", "Review", "User"],
     "relationshipTypes": [
       "FRIENDS",
       "HAS_LABEL",
@@ -138,15 +85,7 @@
       "Transaction",
       "Transfer"
     ],
-    "relationshipTypes": [
-      "HAS_EMAIL",
-      "HAS_PHONE",
-      "HAS_SSN",
-      "NEXT",
-      "PERFORMED",
-      "SENT_TO",
-      "RECEIVED_FROM"
-    ],
+    "relationshipTypes": ["HAS_EMAIL", "HAS_PHONE", "HAS_SSN", "NEXT", "PERFORMED", "SENT_TO", "RECEIVED_FROM"],
     "schema": "payments"
   },
   {
@@ -185,33 +124,12 @@
     "schema": "crime"
   },
   {
-    "labels": [
-      "Airport",
-      "City",
-      "Continent",
-      "Country",
-      "Region"
-    ],
-    "relationshipTypes": [
-      "HAS_ROUTE",
-      "IN_CITY",
-      "IN_COUNTRY",
-      "IN_REGION",
-      "ON_CONTINENT"
-    ],
+    "labels": ["Airport", "City", "Continent", "Country", "Region"],
+    "relationshipTypes": ["HAS_ROUTE", "IN_CITY", "IN_COUNTRY", "IN_REGION", "ON_CONTINENT"],
     "schema": "flights"
   },
   {
-    "labels": [
-      "AgeGroup",
-      "Case",
-      "Drug",
-      "Manufacturer",
-      "Outcome",
-      "Reaction",
-      "ReportSource",
-      "Therapy"
-    ],
+    "labels": ["AgeGroup", "Case", "Drug", "Manufacturer", "Outcome", "Reaction", "ReportSource", "Therapy"],
     "relationshipTypes": [
       "FALLS_UNDER",
       "HAS_REACTION",
@@ -226,5 +144,98 @@
       "RESULTED_IN"
     ],
     "schema": "healthcare"
+  },
+  {
+    "labels": [
+      "Character",
+      "Princess",
+      "Prince",
+      "Queen",
+      "King",
+      "Dwarf",
+      "Hunter",
+      "Witch",
+      "Animal",
+      "Kingdom",
+      "Castle",
+      "Forest",
+      "House",
+      "Village",
+      "MagicalObject",
+      "Spell"
+    ],
+    "relationshipTypes": [
+      "LIVES_IN",
+      "RULES",
+      "MEETS",
+      "LOVES",
+      "HATES",
+      "ENVIES",
+      "HELPS",
+      "ORDERS",
+      "FLEES_FROM",
+      "SHELTERS_IN",
+      "PROTECTS",
+      "MARRIES",
+      "DECEIVES",
+      "SAVES",
+      "POISONS",
+      "BEFRIENDS",
+      "WORKS_FOR",
+      "TRAVELS_TO",
+      "LOCATED_IN",
+      "AWAKENS",
+      "DISCOVERS",
+      "USES",
+      "OWNS",
+      "GIVES",
+      "ASKS",
+      "FEARS",
+      "CONSULTS"
+    ],
+    "schema": "disney"
+  },
+  {
+    "labels": [
+      "Character",
+      "Wizard",
+      "Muggle",
+      "House",
+      "School",
+      "Spell",
+      "MagicalObject",
+      "Location",
+      "Creature",
+      "Book",
+      "Event",
+      "Organization",
+      "Subject",
+      "QuidditchTeam"
+    ],
+    "relationshipTypes": [
+      "ATTENDS",
+      "BELONGS_TO",
+      "CASTS",
+      "OWNS",
+      "FRIENDS_WITH",
+      "ENEMIES_WITH",
+      "DEFEATS",
+      "LEARNS",
+      "USES",
+      "VISITS",
+      "PARTICIPATES_IN",
+      "TEACHES",
+      "STUDIES",
+      "MEMBER_OF",
+      "LOCATED_IN",
+      "DEFENDS",
+      "ATTACKS",
+      "DISCOVERS",
+      "CREATES",
+      "INHERITS",
+      "PLAYS_FOR",
+      "COMPETES_IN"
+    ],
+    "schema": "harry_potter_history"
   }
 ]

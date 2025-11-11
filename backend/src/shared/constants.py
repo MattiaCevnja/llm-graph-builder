@@ -15,8 +15,7 @@ WITH docs, d
 ORDER BY d.createdAt DESC
 
 // Fetch chunks for documents, currently with limit
-CALL {{
-  WITH d
+CALL (d) {{
   OPTIONAL MATCH chunks = (d)<-[:PART_OF|FIRST_CHUNK]-(c:Chunk)
   RETURN c, chunks LIMIT {graph_chunk_limit}
 }}
@@ -28,12 +27,14 @@ WITH collect(distinct docs) AS docs,
 // Select relationships between selected chunks
 WITH *, 
      [c IN selectedChunks | 
-       [p = (c)-[:NEXT_CHUNK|SIMILAR]-(other) 
-       WHERE other IN selectedChunks | p]] AS chunkRels
+       [p = (c)-[:NEXT_CHUNK]-(other) 
+       WHERE other IN selectedChunks | p] +
+       [p = (c)-[:SIMILAR]-(other) 
+       WHERE other IN selectedChunks | p]
+     ] AS chunkRels
 
 // Fetch entities and relationships between entities
-CALL {{
-  WITH selectedChunks
+CALL (selectedChunks) {{
   UNWIND selectedChunks AS c
   OPTIONAL MATCH entities = (c:Chunk)-[:HAS_ENTITY]->(e)
   OPTIONAL MATCH entityRels = (e)--(e2:!Chunk) 
@@ -50,28 +51,34 @@ WITH docs, chunks, chunkRels,
 
 WITH *
 
-CALL {{
-  WITH entity
-  UNWIND entity AS n
+// Fetch communities only if entities exist
+CALL (entity) {{
+  UNWIND CASE 
+    WHEN entity IS NOT NULL AND size(entity) > 0 THEN entity 
+    ELSE [] 
+  END AS n
   OPTIONAL MATCH community = (n:__Entity__)-[:IN_COMMUNITY]->(p:__Community__)
   OPTIONAL MATCH parentcommunity = (p)-[:PARENT_COMMUNITY*]->(p2:__Community__) 
   RETURN collect(community) AS communities, 
          collect(parentcommunity) AS parentCommunities
 }}
 
-WITH apoc.coll.flatten(docs + chunks + chunkRels + entities + entityRels + communities + parentCommunities, true) AS paths
+WITH apoc.coll.flatten(
+  docs + chunks + chunkRels + entities + entityRels + 
+  coalesce(communities, []) + coalesce(parentCommunities, []), 
+  true
+) AS paths
 
 // Distinct nodes and relationships
-CALL {{
-  WITH paths 
+CALL (paths) {{
   UNWIND paths AS path 
   UNWIND nodes(path) AS node 
   WITH distinct node 
-  RETURN collect(node /* {{.*, labels:labels(node), elementId:elementId(node), embedding:null, text:null}} */) AS nodes 
+  RETURN collect(node /* {{.*, labels:labels(node), 
+    elementId:elementId(node), embedding:null, text:null}} */) AS nodes 
 }}
 
-CALL {{
-  WITH paths 
+CALL (paths) {{
   UNWIND paths AS path 
   UNWIND relationships(path) AS rel 
   RETURN collect(distinct rel) AS rels 

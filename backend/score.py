@@ -1037,7 +1037,8 @@ async def backend_connection_configuration():
         password= os.getenv('NEO4J_PASSWORD')
         gcs_file_cache = os.environ.get('GCS_FILE_CACHE')
         if all([uri, username, database, password]):
-            graph = Neo4jGraph()
+            # Use credentials from environment variables
+            graph = Neo4jGraph(url=uri, database=database, username=username, password=password)
             logging.info(f'login connection status of object: {graph}')
             if graph is not None:
                 graph_connection = True        
